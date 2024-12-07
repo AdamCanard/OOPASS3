@@ -20,6 +20,7 @@ public class BSTree<E extends Comparable<E>> implements BSTreeADT<E>, Iterator<E
 		return null;
 	}
 
+	// BSTree Functions
 	@Override
 	public BSTreeNode<E> getRoot() throws NullPointerException {
 		// TODO Auto-generated method stub
