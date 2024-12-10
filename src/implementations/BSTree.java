@@ -5,49 +5,64 @@ import java.util.NoSuchElementException;
 import utilities.BSTreeADT;
 import utilities.Iterator;
 
+import javax.swing.tree.TreeNode;
+
 public class BSTree<E extends Comparable<E>> implements BSTreeADT<E>, Iterator<E> {
 
+	private BSTreeNode<E> root;
+
+	public BSTree() {
+
+	}
 	// Iterator functions
 	@Override
-	public boolean hasNext() {
-		// TODO Auto-generated method stub
+	public boolean hasNext(){
+//		return root.isEmpty();
 		return false;
 	}
 
 	@Override
 	public E next() throws NoSuchElementException {
 		// TODO Auto-generated method stub
+
 		return null;
 	}
 
 	// BSTree Functions
 	@Override
 	public BSTreeNode<E> getRoot() throws NullPointerException {
-		// TODO Auto-generated method stub
-		return null;
+		if (root == null) {
+			throw new NullPointerException();
+		}
+		return root;
 	}
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (root == null){
+			return 0;
+		}
+		return root.getHeight();
 	}
 
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (root == null){
+			return 0;
+		}
+		return root.getNumberNodes();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+        return root == null;
+    }
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
+		if (root != null) {
+			root = null;
+		}
 
 	}
 
