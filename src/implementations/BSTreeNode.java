@@ -99,4 +99,8 @@ public class BSTreeNode<E> {
 		Occurrences = occurences;
 	}
 
+	public Integer getFrequency() {
+		return Occurrences.split(";").length;
+	}
+
 }

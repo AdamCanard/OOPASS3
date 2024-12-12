@@ -47,7 +47,6 @@ public class WordTracker {
 			} else if (outputType.equals("-pl")) {
 				String element = wordTreeIterator.next();
 				String word = element.split(";")[0];
-				System.out.println(element);
 				String fileName = element.split(";")[1].split(":")[0].split("/")[1];
 				String lineNums = element.split(";")[1].split(":")[1];
 
@@ -77,7 +76,7 @@ public class WordTracker {
 
 					} else {
 						String prevOccurences = treeWord.getOccurrences();
-						String[] splitOccurrences = prevOccurences.split(":");
+						String[] splitOccurrences = prevOccurences.split(";");
 
 						int counter = 0;
 						boolean found = false;
@@ -90,14 +89,13 @@ public class WordTracker {
 						}
 						// add new file and Occurence
 						if (!found) {
-							treeWord.setOccurrences(prevOccurences + ":" + fileName + ":" + (i + 1));
+							treeWord.setOccurrences(prevOccurences + ";" + fileName + ":" + (i + 1));
 						} else {
-
 							treeWord.setOccurrences(String.join(":", splitOccurrences));
 						}
 
 						String prevOccurences1 = treeWord.getOccurrences();
-						String[] splitOccurrences1 = prevOccurences1.split(":");
+						String[] splitOccurrences1 = prevOccurences1.split(";");
 					}
 				} catch (Exception e) {
 					wordTree.add(formattedword);
