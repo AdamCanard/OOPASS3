@@ -137,8 +137,6 @@ public class WordTracker {
 							treeWord.setOccurrences(String.join(":", splitOccurrences));
 						}
 
-						String prevOccurences1 = treeWord.getOccurrences();
-						String[] splitOccurrences1 = prevOccurences1.split(";");
 					}
 				} catch (Exception e) {
 					wordTree.add(formattedword);
@@ -147,18 +145,8 @@ public class WordTracker {
 					treeWord.setOccurrences(fileName + ":" + (i + 1));
 				}
 
-				// word not in tree
-
 			}
 		}
-	}
-
-	private static String concat(String[] splitString) {
-		String output = "";
-		for (String s : splitString) {
-			output += s + ":";
-		}
-		return output;
 	}
 
 	public static ArrayList<String> readFile(String fileName) {
