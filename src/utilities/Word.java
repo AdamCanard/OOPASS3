@@ -11,11 +11,6 @@ public class Word implements Comparable<Word> {
 		this.occurrences = new ArrayList<Occurrence>();
 	}
 
-	public Word(String word, ArrayList<Occurrence> occurrences) {
-		this.word = word;
-		this.occurrences = occurrences;
-	}
-
 	public String getWord() {
 		return this.word;
 	}
@@ -41,5 +36,26 @@ public class Word implements Comparable<Word> {
 	public int compareTo(Word word) {
 		String str1 = this.word;
 		return str1.compareTo(word.word);
+	}
+
+	public ArrayList<String> getFileNamesAndLineNums() {
+		ArrayList<String> fileNamesAndLineNums = new ArrayList<String>();
+
+		for (Occurrence occurrence : this.occurrences) {
+			fileNamesAndLineNums.add("found in file: " + occurrence.getFileName() + " found on lines: "
+					+ occurrence.getLineNumbers() + ",");
+		}
+
+		return fileNamesAndLineNums;
+	}
+
+	public String printWordAndOccurrences() {
+		String output = "Key : ===" + this.word + "=== number of entries: " + Integer.toString(this.getFrequency());
+
+		for (String toAppend : this.getFileNamesAndLineNums()) {
+			output += toAppend;
+		}
+
+		return output;
 	}
 }
