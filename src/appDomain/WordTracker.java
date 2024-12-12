@@ -69,6 +69,11 @@ public class WordTracker {
 
 			}
 		}
+		while (!wordTree.isEmpty()) {
+			BSTreeNode<Word> node = wordTree.removeMin();
+			Word word = node.getElement();
+			System.out.println(word.printWordAndOccurrences());
+		}
 
 	}
 
