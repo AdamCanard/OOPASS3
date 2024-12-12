@@ -54,7 +54,7 @@ public class BSTree<E extends Comparable<E>> implements BSTreeADT<E>, Iterator<E
 			if (node.getRight() != null) {
 				moveLeft(node.getRight());
 			}
-			return (E) (node.getElement() + ";" + node.getOccurrences() + node.getFrequency());
+			return (E) (node.getFrequency() + "," + node.getElement() + "~" + node.getOccurrences());
 		case 1:
 			if (!hasNext())
 				throw new NoSuchElementException();

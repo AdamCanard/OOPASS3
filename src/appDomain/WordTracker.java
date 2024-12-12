@@ -3,6 +3,8 @@ package appDomain;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import implementations.BSTree;
@@ -39,21 +41,62 @@ public class WordTracker {
 		while (wordTreeIterator.hasNext()) {
 			if (outputType.equals("-pf")) {
 				String element = wordTreeIterator.next();
-				String word = element.split(";")[0];
-				String fileName = element.split(";")[1].split(":")[0].split("/")[1];
+				String word = getWord(element);
+				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
 
-				String output = "Key : ===" + word + "=== found in file: " + fileName;
-				System.out.println(output);
+				for (Map.Entry<String, String> set : fileNamesAndLines.entrySet()) {
+					String output = "Key : ===" + word + "===" + " found in file: " + set.getKey();
+					System.out.println(output);
+				}
+
 			} else if (outputType.equals("-pl")) {
 				String element = wordTreeIterator.next();
-				String word = element.split(";")[0];
-				String fileName = element.split(";")[1].split(":")[0].split("/")[1];
-				String lineNums = element.split(";")[1].split(":")[1];
+				String word = getWord(element);
+				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
 
-				String output = "Key : ===" + word + "=== found in file: " + fileName + " on lines: " + lineNums;
-				System.out.println(output);
+				for (Map.Entry<String, String> set : fileNamesAndLines.entrySet()) {
+					String output = "Key : ===" + word + "===" + " found in file: " + set.getKey() + " on lines: "
+							+ set.getValue();
+					System.out.println(output);
+				}
+
+			} else if (outputType.equals("-po")) {
+				String element = wordTreeIterator.next();
+				String word = getWord(element);
+				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
+				String frequency = element.split(",")[0];
+
+				for (Map.Entry<String, String> set : fileNamesAndLines.entrySet()) {
+					String output = "Key : ===" + word + "===" + " number of entries: " + frequency + " found in file: "
+							+ set.getKey() + " on lines: " + set.getValue();
+					System.out.println(output);
+				}
+
 			}
 		}
+	}
+
+	private static String getWord(String element) {
+		String word = element.split(",")[1].split("~")[0];
+		return word;
+	}
+
+	private static HashMap<String, String> getFileNamesAndLines(String element) {
+		HashMap<String, String> fileNamesAndLines = new HashMap<>();
+		String[] filesSplit = element.split("~")[1].split(";");
+
+		for (String file : filesSplit) {
+			String fileName = file.split(":")[0];
+			String lineNum = file.split(":")[1];
+
+			if (fileNamesAndLines.containsKey(fileName)) {
+				fileNamesAndLines.put(fileName, fileNamesAndLines.get(fileName) + "," + lineNum);
+			} else {
+				fileNamesAndLines.put(fileName, lineNum);
+			}
+		}
+
+		return fileNamesAndLines;
 	}
 
 	private static void loadTree(ArrayList<String> lineList) {
