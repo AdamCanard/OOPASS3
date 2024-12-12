@@ -1,126 +1,142 @@
 package appDomain;
 
+import implementations.BSTree;
+import implementations.BSTreeNode;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import implementations.BSTree;
-import implementations.BSTreeNode;
+import utilities.Iterator;
 
 public class WordTracker {
 
-	static BSTree<String> wordTree = new BSTree<String>();
+  static BSTree<String> wordTree = new BSTree<String>();
 
-	static String fileName;
-	static String outputType;
-	static String outputFile;
+  static String fileName;
+  static String outputType;
+  static String outputFile;
 
-	public static void main(String[] args) {
+  public static void main(String[] args) {
 
-		fileName = args[0];
-		outputType = args[1];
-		outputFile = "";
-		if (args.length > 2) {
-			outputFile = args[3];
-		}
+    fileName = args[0];
+    outputType = args[1];
+    outputFile = "";
+    if (args.length > 2) {
+      outputFile = args[3];
+    }
 
-		ArrayList<String> lineList = readFile(fileName);
+    ArrayList<String> lineList = readFile(fileName);
 
-		loadTree(lineList);
-		fileName = "res/otherTest.txt";
-		lineList = readFile(fileName);
+    loadTree(lineList);
+    fileName = "res/otherTest.txt";
+    lineList = readFile(fileName);
 
-		loadTree(lineList);
+    loadTree(lineList);
 
-		System.out.println(wordTree);
+    System.out.println(wordTree);
+    Iterator<String> wordTreeIterator = wordTree.inorderIterator();
+    while (wordTreeIterator.hasNext()) {
+      if (outputType.equals("-pf")) {
+        String element = wordTreeIterator.next();
+        String word = element.split(";")[0];
+        String fileName = element.split(";")[1].split(":")[0].split("/")[1];
 
-	}
+        String output = "Key : ===" + word + "=== found in file: " + fileName;
+        System.out.println(output);
+      } else if (outputType.equals("-pl")) {
+        String element = wordTreeIterator.next();
+        String word = element.split(";")[0];
+        String fileName = element.split(";")[1].split(":")[0].split("/")[1];
+        String lineNums = element.split(";")[1].split(":")[1];
 
-	private static void loadTree(ArrayList<String> lineList) {
-		for (int i = 0; i < lineList.size(); i++) {
-			String[] words = lineList.get(i).split(" ");
+        String output =
+            "Key : ===" + word + "=== found in file: " + fileName + " on lines: " + lineNums;
+        System.out.println(output);
+      }
+    }
+  }
 
-			for (String word : words) {
+  private static void loadTree(ArrayList<String> lineList) {
+    for (int i = 0; i < lineList.size(); i++) {
+      String[] words = lineList.get(i).split(" ");
 
-				BSTreeNode<String> treeWord;
-				String formattedword = word.replaceAll("\\p{Punct}", "").toLowerCase();
+      for (String word : words) {
 
-				try {
-					treeWord = wordTree.search(formattedword);
-					if (treeWord == null) {
+        BSTreeNode<String> treeWord;
+        String formattedword = word.replaceAll("\\p{Punct}", "").toLowerCase();
 
-						wordTree.add(formattedword);
-						treeWord = wordTree.search(formattedword);
+        try {
+          treeWord = wordTree.search(formattedword);
+          if (treeWord == null) {
 
-						treeWord.setOccurrences(fileName + ":" + (i + 1));
+            wordTree.add(formattedword);
+            treeWord = wordTree.search(formattedword);
 
-					} else {
-						String prevOccurences = treeWord.getOccurrences();
-						String[] splitOccurrences = prevOccurences.split(":");
+            treeWord.setOccurrences(fileName + ":" + (i + 1));
 
-						int counter = 0;
-						boolean found = false;
-						while (counter < splitOccurrences.length) {
-							if (fileName.equals(splitOccurrences[counter])) {
-								splitOccurrences[counter + 1] += "," + (i + 1);
-								found = true;
-							}
-							counter += 2;
-						}
-						// add new file and Occurence
-						if (!found) {
-							treeWord.setOccurrences(prevOccurences + ":" + fileName + ":" + (i + 1));
-						} else {
+          } else {
+            String prevOccurences = treeWord.getOccurrences();
+            String[] splitOccurrences = prevOccurences.split(":");
 
-							treeWord.setOccurrences(String.join(":", splitOccurrences));
-						}
+            int counter = 0;
+            boolean found = false;
+            while (counter < splitOccurrences.length) {
+              if (fileName.equals(splitOccurrences[counter])) {
+                splitOccurrences[counter + 1] += "," + (i + 1);
+                found = true;
+              }
+              counter += 2;
+            }
+            // add new file and Occurence
+            if (!found) {
+              treeWord.setOccurrences(prevOccurences + ":" + fileName + ":" + (i + 1));
+            } else {
 
-						String prevOccurences1 = treeWord.getOccurrences();
-						String[] splitOccurrences1 = prevOccurences1.split(":");
+              treeWord.setOccurrences(String.join(":", splitOccurrences));
+            }
 
-					}
-				} catch (Exception e) {
-					wordTree.add(formattedword);
-					treeWord = wordTree.search(formattedword);
+            String prevOccurences1 = treeWord.getOccurrences();
+            String[] splitOccurrences1 = prevOccurences1.split(":");
+          }
+        } catch (Exception e) {
+          wordTree.add(formattedword);
+          treeWord = wordTree.search(formattedword);
 
-					treeWord.setOccurrences(fileName + ":" + (i + 1));
+          treeWord.setOccurrences(fileName + ":" + (i + 1));
+        }
 
-				}
+        // word not in tree
 
-				// word not in tree
+      }
+    }
+  }
 
-			}
-		}
+  private static String concat(String[] splitString) {
+    String output = "";
+    for (String s : splitString) {
+      output += s + ":";
+    }
+    return output;
+  }
 
-	}
+  public static ArrayList<String> readFile(String fileName) {
+    ArrayList<String> fileList = new ArrayList<String>();
 
-	private static String concat(String[] splitString) {
-		String output = "";
-		for (String s : splitString) {
-			output += s + ":";
-		}
-		return output;
-	}
+    try {
+      File file = new File(fileName);
+      Scanner myReader = new Scanner(file);
 
-	public static ArrayList<String> readFile(String fileName) {
-		ArrayList<String> fileList = new ArrayList<String>();
+      while (myReader.hasNextLine()) {
+        String data = myReader.nextLine();
+        fileList.add(data.trim());
+      }
 
-		try {
-			File file = new File(fileName);
-			Scanner myReader = new Scanner(file);
+      myReader.close();
+    } catch (FileNotFoundException e) {
+      System.out.println("An error occurred.");
+      e.printStackTrace();
+    }
 
-			while (myReader.hasNextLine()) {
-				String data = myReader.nextLine();
-				fileList.add(data.trim());
-			}
-
-			myReader.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("An error occurred.");
-			e.printStackTrace();
-		}
-
-		return fileList;
-	}
+    return fileList;
+  }
 }
