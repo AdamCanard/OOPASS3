@@ -13,6 +13,7 @@ import utilities.Iterator;
 
 public class WordTracker {
 
+	// init variables
 	static BSTree<String> wordTree = new BSTree<String>();
 
 	static String fileName;
@@ -21,6 +22,7 @@ public class WordTracker {
 
 	public static void main(String[] args) {
 
+		// store args in variables
 		fileName = args[0];
 		outputType = args[1];
 		outputFile = "";
@@ -28,9 +30,12 @@ public class WordTracker {
 			outputFile = args[3];
 		}
 
+		// reads given file to list of lines
 		ArrayList<String> lineList = readFile(fileName);
 
+		// Loads list of lines into BSTree
 		loadTree(lineList);
+
 		fileName = "res/otherTest.txt";
 		lineList = readFile(fileName);
 
@@ -100,45 +105,63 @@ public class WordTracker {
 	}
 
 	private static void loadTree(ArrayList<String> lineList) {
+		// for every line in file
 		for (int i = 0; i < lineList.size(); i++) {
+			// split line by spaces
 			String[] words = lineList.get(i).split(" ");
 
+			// for every word in the line
 			for (String word : words) {
 
 				BSTreeNode<String> treeWord;
+
+				// remove all punctuation attached to the word and make it lowercase
 				String formattedword = word.replaceAll("\\p{Punct}", "").toLowerCase();
 
+				// try catch for null pointer exception
+				// throws null pointer in the tree is empty
 				try {
+					// search the tree for word
 					treeWord = wordTree.search(formattedword);
+					// if word is not in the tree
 					if (treeWord == null) {
 
+						// add word to tree
 						wordTree.add(formattedword);
+						// find the BSTreeNode for the added word
 						treeWord = wordTree.search(formattedword);
-
+						// add an occurrence for current file and line number
 						treeWord.setOccurrences(fileName + ":" + (i + 1));
 
 					} else {
+						// if the word is already in the tree, get its occurrences
 						String prevOccurences = treeWord.getOccurrences();
+						// split by files
 						String[] splitOccurrences = prevOccurences.split(";");
 
 						int counter = 0;
 						boolean found = false;
+						// loop through occurrences
 						while (counter < splitOccurrences.length) {
+							// if filename is in occurrences
 							if (fileName.equals(splitOccurrences[counter])) {
+								// add the line number to the occurrences
 								splitOccurrences[counter + 1] += "," + (i + 1);
 								found = true;
 							}
 							counter += 2;
 						}
-						// add new file and Occurence
+						// if file is not in occurrences add new file and line number
 						if (!found) {
 							treeWord.setOccurrences(prevOccurences + ";" + fileName + ":" + (i + 1));
 						} else {
-							treeWord.setOccurrences(String.join(":", splitOccurrences));
+							// add occurrences back together and save to BSTreeNode
+							treeWord.setOccurrences(String.join(";", splitOccurrences));
 						}
 
 					}
 				} catch (Exception e) {
+					// if tree is empty, add word to tree with file and current line
 					wordTree.add(formattedword);
 					treeWord = wordTree.search(formattedword);
 
