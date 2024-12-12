@@ -5,9 +5,16 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import implementations.BSTree;
+import implementations.BSTreeNode;
+import utilities.Occurrence;
+import utilities.Word;
+
 public class WordTracker {
 
 	public static void main(String[] args) {
+
+		BSTree<Word> wordTree = new BSTree<Word>();
 
 		String fileName = args[0];
 		String outputType = args[1];
@@ -18,7 +25,49 @@ public class WordTracker {
 
 		ArrayList<String> lineList = readFile(fileName);
 		for (int i = 0; i < lineList.size(); i++) {
-			System.out.println(lineList.get(i));
+			String[] words = lineList.get(i).split(" ");
+			for (String word : words) {
+				Word newWord = new Word(word);
+				BSTreeNode<Word> treeWord;
+				try {
+					treeWord = wordTree.search(newWord);
+				} catch (Exception e) {
+					ArrayList<Integer> lines = new ArrayList<Integer>();
+					lines.add(i);
+					Occurrence newOccurence = new Occurrence(fileName, lines);
+					newWord.addOccurrence(newOccurence);
+					wordTree.add(newWord);
+					break;
+				}
+
+				// word not in tree
+				if (treeWord == null) {
+					ArrayList<Integer> lines = new ArrayList<Integer>();
+					lines.add(i);
+					Occurrence newOccurence = new Occurrence(fileName, lines);
+					newWord.addOccurrence(newOccurence);
+					wordTree.add(newWord);
+				} else {
+					Word wordFromTree = treeWord.getElement();
+					ArrayList<Occurrence> wordOccurrences = wordFromTree.getOccurrences();
+					boolean found = false;
+					for (int j = 0; j < wordOccurrences.size(); j++) {
+						Occurrence occurrence = wordOccurrences.get(j);
+						if (occurrence.getFileName().equals(fileName)) {
+							occurrence.addLineNumber(i);
+							found = true;
+						}
+					}
+					if (!found) {
+						ArrayList<Integer> lines = new ArrayList<Integer>();
+						lines.add(i);
+						Occurrence newOccurence = new Occurrence(fileName, lines);
+						wordFromTree.addOccurrence(newOccurence);
+					}
+
+				}
+
+			}
 		}
 
 	}
