@@ -156,7 +156,7 @@ public class WordTracker {
 							treeWord.setOccurrences(prevOccurences + ";" + fileName + ":" + (i + 1));
 						} else {
 							// add occurrences back together and save to BSTreeNode
-							treeWord.setOccurrences(String.join(";", splitOccurrences));
+							treeWord.setOccurrences(String.join(":", splitOccurrences));
 						}
 
 					}
