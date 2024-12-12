@@ -7,62 +7,100 @@ import java.util.Scanner;
 
 import implementations.BSTree;
 import implementations.BSTreeNode;
-import utilities.Occurrence;
-import utilities.Word;
 
 public class WordTracker {
 
+	static BSTree<String> wordTree = new BSTree<String>();
+
+	static String fileName;
+	static String outputType;
+	static String outputFile;
+
 	public static void main(String[] args) {
 
-		BSTree<Word> wordTree = new BSTree<Word>();
-
-		String fileName = args[0];
-		String outputType = args[1];
-		String outputFile = "";
+		fileName = args[0];
+		outputType = args[1];
+		outputFile = "";
 		if (args.length > 2) {
 			outputFile = args[3];
 		}
 
 		ArrayList<String> lineList = readFile(fileName);
 
+		loadTree(lineList);
+		fileName = "res/otherTest.txt";
+		lineList = readFile(fileName);
+
+		loadTree(lineList);
+
+		System.out.println(wordTree);
+
+	}
+
+	private static void loadTree(ArrayList<String> lineList) {
 		for (int i = 0; i < lineList.size(); i++) {
 			String[] words = lineList.get(i).split(" ");
 
 			for (String word : words) {
-				Word newWord = new Word(word);
-				BSTreeNode<Word> treeWord;
+
+				BSTreeNode<String> treeWord;
+				String formattedword = word.replaceAll("\\p{Punct}", "").toLowerCase();
 
 				try {
-					treeWord = wordTree.search(newWord);
+					treeWord = wordTree.search(formattedword);
+					if (treeWord == null) {
+
+						wordTree.add(formattedword);
+						treeWord = wordTree.search(formattedword);
+
+						treeWord.setOccurrences(fileName + ":" + (i + 1));
+
+					} else {
+						String prevOccurences = treeWord.getOccurrences();
+						String[] splitOccurrences = prevOccurences.split(":");
+
+						int counter = 0;
+						boolean found = false;
+						while (counter < splitOccurrences.length) {
+							if (fileName.equals(splitOccurrences[counter])) {
+								splitOccurrences[counter + 1] += "," + (i + 1);
+								found = true;
+							}
+							counter += 2;
+						}
+						// add new file and Occurence
+						if (!found) {
+							treeWord.setOccurrences(prevOccurences + ":" + fileName + ":" + (i + 1));
+						} else {
+
+							treeWord.setOccurrences(String.join(":", splitOccurrences));
+						}
+
+						String prevOccurences1 = treeWord.getOccurrences();
+						String[] splitOccurrences1 = prevOccurences1.split(":");
+
+					}
 				} catch (Exception e) {
-					ArrayList<Integer> lines = new ArrayList<Integer>();
-					lines.add(i);
-					Occurrence newOccurence = new Occurrence(fileName, lines);
-					newWord.addOccurrence(newOccurence);
-					wordTree.add(newWord);
-					break;
+					wordTree.add(formattedword);
+					treeWord = wordTree.search(formattedword);
+
+					treeWord.setOccurrences(fileName + ":" + (i + 1));
+
 				}
 
 				// word not in tree
-				if (treeWord == null) {
-					ArrayList<Integer> lines = new ArrayList<Integer>();
-					lines.add(i);
-					Occurrence newOccurence = new Occurrence(fileName, lines);
-					newWord.addOccurrence(newOccurence);
-					wordTree.add(newWord);
-				} else {
-					BSTreeNode treeNode = treeWord;
-					treeNode.updateNode(fileName, i);
-				}
+
 			}
 		}
-		while (!wordTree.isEmpty()) {
 
-			BSTreeNode<Word> node = wordTree.removeMin();
-			Word word = node.getElement();
-			System.out.println(word.printWordAndOccurrences());
+	}
+
+	private static String concat(String[] splitString) {
+		String output = "";
+		for (String s : splitString) {
+			output += s + ":";
 		}
-
+		return output;
 	}
 
 	public static ArrayList<String> readFile(String fileName) {
