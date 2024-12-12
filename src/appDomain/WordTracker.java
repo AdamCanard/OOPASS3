@@ -24,11 +24,14 @@ public class WordTracker {
 		}
 
 		ArrayList<String> lineList = readFile(fileName);
+
 		for (int i = 0; i < lineList.size(); i++) {
 			String[] words = lineList.get(i).split(" ");
+
 			for (String word : words) {
 				Word newWord = new Word(word);
 				BSTreeNode<Word> treeWord;
+
 				try {
 					treeWord = wordTree.search(newWord);
 				} catch (Exception e) {
@@ -48,28 +51,13 @@ public class WordTracker {
 					newWord.addOccurrence(newOccurence);
 					wordTree.add(newWord);
 				} else {
-					Word wordFromTree = treeWord.getElement();
-					ArrayList<Occurrence> wordOccurrences = wordFromTree.getOccurrences();
-					boolean found = false;
-					for (int j = 0; j < wordOccurrences.size(); j++) {
-						Occurrence occurrence = wordOccurrences.get(j);
-						if (occurrence.getFileName().equals(fileName)) {
-							occurrence.addLineNumber(i);
-							found = true;
-						}
-					}
-					if (!found) {
-						ArrayList<Integer> lines = new ArrayList<Integer>();
-						lines.add(i);
-						Occurrence newOccurence = new Occurrence(fileName, lines);
-						wordFromTree.addOccurrence(newOccurence);
-					}
-
+					BSTreeNode treeNode = treeWord;
+					treeNode.updateNode(fileName, i);
 				}
-
 			}
 		}
 		while (!wordTree.isEmpty()) {
+
 			BSTreeNode<Word> node = wordTree.removeMin();
 			Word word = node.getElement();
 			System.out.println(word.printWordAndOccurrences());
@@ -83,6 +71,7 @@ public class WordTracker {
 		try {
 			File file = new File(fileName);
 			Scanner myReader = new Scanner(file);
+
 			while (myReader.hasNextLine()) {
 				String data = myReader.nextLine();
 				fileList.add(data.trim());
@@ -93,6 +82,7 @@ public class WordTracker {
 			System.out.println("An error occurred.");
 			e.printStackTrace();
 		}
+
 		return fileList;
 	}
 }
