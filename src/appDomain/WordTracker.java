@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -34,7 +36,7 @@ public class WordTracker {
 			outputFile = args[3];
 		}
 
-		if (new File("repository.ser").exists()) {
+		if (new File("res/repository.ser").exists()) {
 			System.out.println("Loading serialized repository...");
 			try {
 				FileInputStream Stream = new FileInputStream("repository.ser");
@@ -57,10 +59,18 @@ public class WordTracker {
 
 		loadTree(lineList);
 
+		printOutput(outputType, wordTree);
+
+		writeToFile(wordTree, "test.txt");
+
+		serializeWriteBSTree(wordTree);
+	}
+
+	private static void printOutput(String outputType, BSTree<String> wordTree) {
 		Iterator<String> wordTreeIterator = wordTree.inorderIterator();
 
-		while (wordTreeIterator.hasNext()) {
-			if (outputType.equals("-pf")) {
+		if (outputType.equals("-pf")) {
+			while (wordTreeIterator.hasNext()) {
 				String element = wordTreeIterator.next();
 				String word = getWord(element);
 				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
@@ -69,8 +79,9 @@ public class WordTracker {
 					String output = "Key : ===" + word + "===" + " found in file: " + set.getKey();
 					System.out.println(output);
 				}
-
-			} else if (outputType.equals("-pl")) {
+			}
+		} else if (outputType.equals("-pl")) {
+			while (wordTreeIterator.hasNext()) {
 				String element = wordTreeIterator.next();
 				String word = getWord(element);
 				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
@@ -80,10 +91,10 @@ public class WordTracker {
 							+ set.getValue();
 					System.out.println(output);
 				}
-
-			} else if (outputType.equals("-po")) {
+			}
+		} else if (outputType.equals("-po")) {
+			while (wordTreeIterator.hasNext()) {
 				String element = wordTreeIterator.next();
-				System.out.println(element);
 				String word = getWord(element);
 				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
 				String frequency = element.split(",")[0];
@@ -93,16 +104,63 @@ public class WordTracker {
 							+ set.getKey() + " on lines: " + set.getValue();
 					System.out.println(output);
 				}
-
 			}
 		}
+	}
 
-		serializeWriteBSTree(wordTree);
+	private static void writeToFile(BSTree<String> toWrite, String fileName) {
+		try {
+			FileWriter treeWriter = new FileWriter(fileName);
+			Iterator<String> wordTreeIterator = wordTree.inorderIterator();
+
+			if (outputType.equals("-pf")) {
+				while (wordTreeIterator.hasNext()) {
+					String element = wordTreeIterator.next();
+					String word = getWord(element);
+					HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
+
+					for (Map.Entry<String, String> set : fileNamesAndLines.entrySet()) {
+						String output = "Key : ===" + word + "===" + " found in file: " + set.getKey();
+						treeWriter.write(output + "\n");
+					}
+				}
+			} else if (outputType.equals("-pl")) {
+				while (wordTreeIterator.hasNext()) {
+					String element = wordTreeIterator.next();
+					String word = getWord(element);
+					HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
+
+					for (Map.Entry<String, String> set : fileNamesAndLines.entrySet()) {
+						String output = "Key : ===" + word + "===" + " found in file: " + set.getKey() + " on lines: "
+								+ set.getValue();
+						treeWriter.write(output + "\n");
+					}
+				}
+			} else if (outputType.equals("-po")) {
+				while (wordTreeIterator.hasNext()) {
+					String element = wordTreeIterator.next();
+					String word = getWord(element);
+					HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
+					String frequency = element.split(",")[0];
+
+					for (Map.Entry<String, String> set : fileNamesAndLines.entrySet()) {
+						String output = "Key : ===" + word + "===" + " number of entries: " + frequency
+								+ " found in file: " + set.getKey() + " on lines: " + set.getValue();
+						treeWriter.write(output + "\n");
+					}
+				}
+			}
+
+			System.out.println("Successfully written to " + fileName);
+		} catch (IOException e) {
+			System.out.print("Error while writing to file: ");
+			System.out.print(e);
+		}
 	}
 
 	private static void serializeWriteBSTree(BSTree<String> toWrite) {
 		try {
-			OutputStream Stream = new FileOutputStream("repository.ser");
+			OutputStream Stream = new FileOutputStream("res/repository.ser");
 			ObjectOutputStream Out = new ObjectOutputStream(new BufferedOutputStream(Stream));
 			Out.writeObject(wordTree);
 			Out.close();
