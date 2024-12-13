@@ -1,7 +1,11 @@
 package appDomain;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,6 +102,23 @@ public class WordTracker {
 		}
 
 		return fileNamesAndLines;
+		serializeWriteBSTree(wordTree);
+
+	}
+
+	private static void serializeWriteBSTree(BSTree<String> toWrite) {
+		try {
+			OutputStream Stream = new FileOutputStream("repository.ser");
+			ObjectOutputStream Out = new ObjectOutputStream(new BufferedOutputStream(Stream));
+			Out.writeObject(wordTree);
+			Out.close();
+			Stream.close();
+			System.out.println("WordTree has been saved in repository.ser.");
+
+		} catch (Exception e) {
+			System.out.println("There was an error writing wordTree to repository.ser.");
+			System.out.println(e);
+		}
 	}
 
 	private static void loadTree(ArrayList<String> lineList) {
