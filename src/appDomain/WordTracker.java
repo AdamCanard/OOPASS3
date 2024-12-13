@@ -3,8 +3,6 @@ package appDomain;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 import implementations.BSTree;
@@ -45,63 +43,63 @@ public class WordTracker {
 
 		while (wordTreeIterator.hasNext()) {
 			if (outputType.equals("-pf")) {
-				String element = wordTreeIterator.next();
-				String word = getWord(element);
-				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
+				String word = wordTreeIterator.next();
+				BSTreeNode<String> treeWord = wordTree.search(word);
+				String occurrences = treeWord.getOccurrences();
 
-				for (Map.Entry<String, String> set : fileNamesAndLines.entrySet()) {
-					String output = "Key : ===" + word + "===" + " found in file: " + set.getKey();
-					System.out.println(output);
+				String[] splitOccurrences = occurrences.split(":");
+				String output = "Key : ===" + word + "===" + " found in file: ";
+				String files = "";
+				int counter = 0;
+				while (counter < splitOccurrences.length) {
+					String currentFile = splitOccurrences[counter];
+					files += currentFile + ", ";
+					counter += 2;
 				}
+				System.out.println(output + files);
 
 			} else if (outputType.equals("-pl")) {
-				String element = wordTreeIterator.next();
-				String word = getWord(element);
-				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
+				String word = wordTreeIterator.next();
 
-				for (Map.Entry<String, String> set : fileNamesAndLines.entrySet()) {
-					String output = "Key : ===" + word + "===" + " found in file: " + set.getKey() + " on lines: "
-							+ set.getValue();
-					System.out.println(output);
+				BSTreeNode<String> treeWord = wordTree.search(word);
+				String occurrences = treeWord.getOccurrences();
+
+				String[] splitOccurrences = occurrences.split(":");
+				String output = "Key : ===" + word + "===" + " ";
+				int frequency = 0;
+				int counter = 0;
+				while (counter < splitOccurrences.length) {
+					String currentFile = splitOccurrences[counter];
+					String linesInFile = splitOccurrences[counter + 1];
+					counter += 2;
+					output += " " + currentFile + " on lines: " + linesInFile;
 				}
+
+				System.out.println(output.replaceAll("#", Integer.toString(frequency)));
 
 			} else if (outputType.equals("-po")) {
-				String element = wordTreeIterator.next();
-				String word = getWord(element);
-				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
-				String frequency = element.split(",")[0];
+				String word = wordTreeIterator.next();
 
-				for (Map.Entry<String, String> set : fileNamesAndLines.entrySet()) {
-					String output = "Key : ===" + word + "===" + " number of entries: " + frequency + " found in file: "
-							+ set.getKey() + " on lines: " + set.getValue();
-					System.out.println(output);
+				BSTreeNode<String> treeWord = wordTree.search(word);
+				String occurrences = treeWord.getOccurrences();
+
+				String[] splitOccurrences = occurrences.split(":");
+				String output = "Key : ===" + word + "===" + " number of entries: #";
+				int frequency = 0;
+				int counter = 0;
+				while (counter < splitOccurrences.length) {
+					String currentFile = splitOccurrences[counter];
+					String linesInFile = splitOccurrences[counter + 1];
+					frequency += splitOccurrences[counter + 1].split(",").length;
+					counter += 2;
+					output += " " + currentFile + " on lines: " + linesInFile;
 				}
 
-			}
-		}
-	}
+				System.out.println(output.replaceAll("#", Integer.toString(frequency)));
 
-	private static String getWord(String element) {
-		String word = element.split(",")[1].split("~")[0];
-		return word;
-	}
-
-	private static HashMap<String, String> getFileNamesAndLines(String element) {
-		HashMap<String, String> fileNamesAndLines = new HashMap<>();
-		String[] filesSplit = element.split("~")[1].split(";");
-
-		for (String file : filesSplit) {
-			String fileName = file.split(":")[0];
-			String lineNum = file.split(":")[1];
-
-			if (fileNamesAndLines.containsKey(fileName)) {
-				fileNamesAndLines.put(fileName, fileNamesAndLines.get(fileName) + "," + lineNum);
-			} else {
-				fileNamesAndLines.put(fileName, lineNum);
 			}
 		}
 
-		return fileNamesAndLines;
 	}
 
 	private static void loadTree(ArrayList<String> lineList) {
@@ -137,7 +135,7 @@ public class WordTracker {
 						// if the word is already in the tree, get its occurrences
 						String prevOccurences = treeWord.getOccurrences();
 						// split by files
-						String[] splitOccurrences = prevOccurences.split(";");
+						String[] splitOccurrences = prevOccurences.split(":");
 
 						int counter = 0;
 						boolean found = false;
@@ -153,7 +151,7 @@ public class WordTracker {
 						}
 						// if file is not in occurrences add new file and line number
 						if (!found) {
-							treeWord.setOccurrences(prevOccurences + ";" + fileName + ":" + (i + 1));
+							treeWord.setOccurrences(prevOccurences + ":" + fileName + ":" + (i + 1));
 						} else {
 							// add occurrences back together and save to BSTreeNode
 							treeWord.setOccurrences(String.join(":", splitOccurrences));
