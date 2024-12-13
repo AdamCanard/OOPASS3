@@ -1,12 +1,13 @@
 package implementations;
 
+import java.io.Serializable;
 import java.util.NoSuchElementException;
 import java.util.Stack;
 
 import utilities.BSTreeADT;
 import utilities.Iterator;
 
-public class BSTree<E extends Comparable<E>> implements BSTreeADT<E>, Iterator<E> {
+public class BSTree<E extends Comparable<E>> implements BSTreeADT<E>, Iterator<E>, Serializable {
 
 	private BSTreeNode<E> root;
 	// 0 = in, 1, pre, 2, post
