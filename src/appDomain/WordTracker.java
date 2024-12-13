@@ -62,6 +62,7 @@ public class WordTracker {
 
 			} else if (outputType.equals("-po")) {
 				String element = wordTreeIterator.next();
+				System.out.println(element);
 				String word = getWord(element);
 				HashMap<String, String> fileNamesAndLines = getFileNamesAndLines(element);
 				String frequency = element.split(",")[0];
