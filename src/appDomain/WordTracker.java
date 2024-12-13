@@ -2,8 +2,10 @@ package appDomain;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -30,6 +32,21 @@ public class WordTracker {
 		outputFile = "";
 		if (args.length > 2) {
 			outputFile = args[3];
+		}
+
+		if (new File("repository.ser").exists()) {
+			System.out.println("Loading serialized repository...");
+			try {
+				FileInputStream Stream = new FileInputStream("repository.ser");
+				ObjectInputStream Saved;
+				Saved = new ObjectInputStream(Stream);
+				wordTree = (BSTree<String>) Saved.readObject();
+
+				Stream.close();
+				Saved.close();
+			} catch (Exception e) {
+				System.out.println("Error loading serialized wordtree.");
+			}
 		}
 
 		ArrayList<String> lineList = readFile(fileName);
