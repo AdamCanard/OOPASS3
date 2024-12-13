@@ -59,9 +59,11 @@ public class WordTracker {
 
 		loadTree(lineList);
 
-		printOutput(outputType, wordTree);
-
-		writeToFile(wordTree, "test.txt");
+		if (!outputFile.equals("")) {
+			writeToFile(wordTree, outputFile);
+		} else {
+			printOutput(outputType, wordTree);
+		}
 
 		serializeWriteBSTree(wordTree);
 	}
