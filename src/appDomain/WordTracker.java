@@ -160,6 +160,7 @@ public class WordTracker {
 //						treeWriter.write(output + "\n");
 //					}
 				}
+
 			} else if (outputType.equals("-pl")) {
 				while (wordTreeIterator.hasNext()) {
 
@@ -224,7 +225,7 @@ public class WordTracker {
 //					}
 				}
 			}
-
+			treeWriter.close();
 			System.out.println("Successfully written to " + fileName);
 		} catch (IOException e) {
 			System.out.print("Error while writing to file: ");
