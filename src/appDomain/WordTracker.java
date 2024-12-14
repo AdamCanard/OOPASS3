@@ -37,7 +37,7 @@ public class WordTracker {
 		if (new File("res/repository.ser").exists()) {
 			System.out.println("Loading serialized repository...");
 			try {
-				FileInputStream Stream = new FileInputStream("repository.ser");
+				FileInputStream Stream = new FileInputStream("res/repository.ser");
 				ObjectInputStream Saved;
 				Saved = new ObjectInputStream(Stream);
 				wordTree = (BSTree<String>) Saved.readObject();
@@ -45,15 +45,11 @@ public class WordTracker {
 				Stream.close();
 				Saved.close();
 			} catch (Exception e) {
-				System.out.println("Error loading serialized wordtree.");
+				System.out.println("Error loading serialized wordtree. " + e.getMessage());
 			}
 		}
 
 		ArrayList<String> lineList = readFile(fileName);
-
-		loadTree(lineList);
-		fileName = "res/otherTest.txt";
-		lineList = readFile(fileName);
 
 		loadTree(lineList);
 
@@ -118,7 +114,7 @@ public class WordTracker {
 				String output = "Key : ===" + word + "===" + " number of entries: #";
 				int frequency = 0;
 				int counter = 0;
-				while (counter+1 < splitOccurrences.length) {
+				while (counter + 1 < splitOccurrences.length) {
 					String currentFile = splitOccurrences[counter];
 					String linesInFile = splitOccurrences[counter + 1];
 					frequency += splitOccurrences[counter + 1].split(",").length;
